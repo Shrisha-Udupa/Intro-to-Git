@@ -1,0 +1,73 @@
+
+					----------------------------------------------------------------------
+					  STEPS FOR KERNEL DOWNLOADING, CONFIGURING, BUILDING AND INSTALLING
+					----------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+TIPS :
+
+1. Edit the Makefile of the kernel source directory which you are building to make any changes. eg: Edit the EXTRAVERSION to your name.
+2. Make use of 'time' command to know the building times.
+3. Some commands may need particular libraries to be installed. Please install the corresponding libraries before using the command.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Step 1 : Download the kernel from kernel.org (git clone and pull or wget can also be used)
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 2 : Untar the kernel source
+	 tar -xvf linux-4.x.y.z.tar.xz ------> Here 'j' option is for .bz2 compression or use 'z' option for .gz compression
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 3 : Configure the kernel (The kernel contains nearly 3000 configuration options)
+	 cd linux-4.x.y.z
+	 make config ------------> Yes/No text-based command-line utility
+	 (or) make menuconfig ---> ncurses-based graphical utility (sudo apt-get install libncurses5-dev)
+	 (or) make gconfig ------> GTK+-based graphical utility
+	 (or) make xconfig/qconfig ------> Requires QT library 
+	 (or) make defconfig ----> Creates a configuration based on the defaults of your architecture
+	 (or) make oldconfig ----> Creates a configuration based on the old existing configuration file
+
+	 You can also make use of the .config file for the present kernel installed in usr/src/kernel version/ directory. A .config file will be created in the kernel source directory after configuring the kernel.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 4 : Compiling the Kernel
+	 time make -jn -----> where n is the no. of jobs to spawn. Usual practice is to spawn one or two jobs per processor.
+			      Generates vmlinuz, bzimage and modules (find . -name '*.ko')	
+ 
+	 (or) make -jn bzImage -------> Generates vmlinux image in the same directory, bootable bzimage (which contains compressed vmlinux image)in arch/x86/boot but no modules are created (.ko files)
+	 
+
+For cross-compilation, you need cross-compiler toolchain and libraries to be installed (arm-linux-gnueabi-gcc). Image is bootloader dependent.
+	export CROSS_COMPILE=arm-linux-gnueabi
+	make ARCH=arm uimage
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 5 : Compiling Kernel modules
+	 make modules ------> Not required if you have generated modules in the previous step
+
+(If you want to re-compile your kernel,use 'make clean' command or 'make mrproper' command.'make mrproper' command deletes the .config file too)
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 6 : Installing Kernel modules
+	 make modules_install -------> Creates a folder /lib/modules/linux-4.x.y.z and copies all .ko files and also calls 'depmode' to produce the files for 'modprobe' that are used for dependencies. (You need to be root to install modules or install kernel)
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+	
+Step 7 : Installing the Kernel
+	 make install -------> Creates vmlinuz, system.map, config and initrd.img images in /boot directory
+	 Also updates the grub.cfg in /boot/grub by default
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 8 : Booting Linux to the new kernel
+	 reboot
+	 uname -r
+
+------------------------------------------------------------------------------------------------------------------------------------------------
